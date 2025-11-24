@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Antarctica Life | Complete Expedition</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Use Inter font and fallback to a clean Thai font -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Noto+Sans+Thai:wght@100..900&display=swap');
+        
+        body {
+            font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+            background-color: #F8FAFC; 
+            scroll-behavior: smooth;
+        }
+
+        /* --- SPA UTILITIES --- */
+        .hidden-section {
+            display: none !important;
+        }
+        .active-section {
+            display: block !important;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* --- THEME COLORS --- */
+        .text-natgeo-blue { color: #004680; }
+        .bg-ice-blue-light { background-color: #E6F7FF; }
+        .bg-natgeo-blue { background-color: #004680; }
+        .border-natgeo-blue { border-color: #004680; }
+        .border-ice-blue { border-color: #A0D7E8; }
+
+        /* --- IMAGES & LOGOS --- */
+        .university-logo {
+            filter: brightness(0.5) sepia(1) saturate(5) hue-rotate(190deg);
+        }
+        .card-image-wrapper, .overflow-hidden {
+            overflow: hidden;
+        }
+        /* Specific heights for cards */
+        .card-image, .card-image-seal, .card-image-penguin, .card-image-misc, .member-photo {
+            width: 100%;
+            height: 250px; 
+            object-fit: cover;
+            transition: transform 0.3s ease-in-out;
+        }
+        .card-image-container:hover .card-image,
+        .card-item:hover .card-image-seal,
+        .card-item:hover .card-image-penguin,
+        .card-item:hover .card-image-misc {
+            transform: scale(1.05);
+        }
+
+        /* --- HERO BACKGROUNDS --- */
+        .hero-overlay { background-color: rgba(0, 70, 128, 0.5); }
+        
+        .hero-bg { background-image: url('https://www.swoop-antarctica.com/blog/wp-content/uploads/2024/02/Peninsula.jpg'); background-size: cover; background-position: center; position: relative; }
+        .hero-bg-polar { background-image: url('https://images.unsplash.com/photo-1589656966895-2f33e7653819?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwcm9maWxlLWxpa2VkfDEzfHx8ZW58MHx8fHx8'); background-size: cover; background-position: center 30%; position: relative; }
+        .hero-bg-seal { background-image: url('https://sp-ao.shortpixel.ai/client/to_auto,q_lossy,ret_img,w_1024,h_576/https://www.swoop-antarctica.com/blog/wp-content/uploads/2024/09/53567344814_1e89530373_5k-1-1024x576.jpg'); background-size: cover; background-position: center 30%; position: relative; }
+        .hero-bg-penguin { background-image: url('https://www.antarcticaguide.com/storage/app/media//antarctica-penguins.jpg'); background-size: cover; background-position: center 70%; position: relative; }
+        .hero-bg-orca { background-image: url('https://www.thoughtco.com/thmb/JLrfh7xjQM3bBGCQUaZhgNuEcok=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/GettyImages-595710436-e9fb5588826f403193ff399bcc8c0d3d.jpg'); background-size: cover; background-position: center 70%; position: relative; }
+        .hero-bg-misc { background-image: url('https://www.ctvnews.ca/resizer/v2/FMNNSUGZYBDVXEDDTZCYANMORU.JPG?smart=true&auth=dc2097ef8884cc33f010c671cf160e0f3b5c53567f6fec80b5ee44f01c1c9119&width=2000&height=1125'); background-size: cover; background-position: center 30%; position: relative; }
+        .hero-bg-members { background-image: url('https://www.spu.ac.th/wp-content/uploads/2022/02/SPU-Gallery-3.webp'); background-size: cover; background-position: center 50%; position: relative; }
+
+        /* --- DROPDOWNS & MODALS --- */
+        .dropdown-menu-transition { transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; transform-origin: top; }
+        .dropdown-hidden { opacity: 0; transform: scaleY(0.9); visibility: hidden; pointer-events: none; }
+        .dropdown-visible { opacity: 1; transform: scaleY(1); visibility: visible; pointer-events: auto; }
+        .modal { transition: opacity 0.3s ease-in-out; }
+        .modal-content { transition: transform 0.3s ease-in-out; }
+        
+        .member-card { transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; }
+        .member-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0, 70, 128, 0.3); }
+    </style>
+</head>
+<body class="text-gray-800 flex flex-col min-h-screen">
+
+    <!-- 1. NAVIGATION BAR -->
+    <nav class="sticky top-0 z-50 bg-white shadow-lg border-b-4 border-natgeo-blue">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <a href="#" onclick="navigateTo('home'); return false;" class="flex-shrink-0 flex items-center text-2xl font-extrabold text-natgeo-blue tracking-wider">
+                        <img src="new_logo_spu04.gif" alt="SPU Logo" class="w-16 h-auto mr-2 university-logo">
+                        ANTARCTICA LIFE
+                    </a>
+                </div>
+                <!-- Desktop Links -->
+                <div class="hidden sm:ml-6 sm:flex sm:space-x-8 items-center">
+                    <button onclick="navigateTo('home')" class="text-gray-600 hover:text-natgeo-blue px-3 py-2 rounded-lg transition duration-150 font-medium">หน้าแรก</button>
+                    <button onclick="navigateTo('home', 'about')" class="text-gray-600 hover:text-natgeo-blue px-3 py-2 rounded-lg transition duration-150 font-medium">แผ่นน้ำแข็ง</button>
+                    
+                    <!-- Dropdown -->
+                    <div class="relative" id="wildlife-dropdown-container">
+                        <button id="wildlife-dropdown-btn" class="text-gray-600 hover:text-natgeo-blue px-3 py-2 rounded-lg transition duration-150 flex items-center focus:outline-none font-medium" aria-expanded="false">
+                            สิ่งมีชีวิต
+                            <svg class="ml-1 w-4 h-4 transition duration-150" id="dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+                        <div id="wildlife-dropdown-menu" class="absolute right-0 mt-3 py-2 bg-white rounded-lg shadow-xl border-2 border-natgeo-blue overflow-hidden z-40 dropdown-menu-transition dropdown-hidden">
+                            <button onclick="navigateTo('seal')" class="text-left w-full block px-4 py-2 text-gray-700 hover:bg-blue-100 hover:text-natgeo-blue transition duration-150 min-w-[150px]">แมวน้ำ (Seal)</button>
+                            <button onclick="navigateTo('polarbear')" class="text-left w-full block px-4 py-2 text-gray-700 hover:bg-blue-100 hover:text-natgeo-blue transition duration-150">หมีขั้วโลก (Polar Bear)</button>
+                            <button onclick="navigateTo('penguin')" class="text-left w-full block px-4 py-2 text-gray-700 hover:bg-blue-100 hover:text-natgeo-blue transition duration-150">เพนกวิน (Penguin)</button>
+                            <button onclick="navigateTo('orca')" class="text-left w-full block px-4 py-2 text-gray-700 hover:bg-blue-100 hover:text-natgeo-blue transition duration-150">วาฬเพชฌฆาต (Orca)</button>
+                            <button onclick="navigateTo('misc')" class="text-left w-full block px-4 py-2 text-gray-700 hover:bg-blue-100 hover:text-natgeo-blue transition duration-150">เบ็ดเตล็ด (Misc.)</button>
+                        </div>
+                    </div>
+
+                    <button onclick="navigateTo('group')" class="bg-white text-natgeo-blue font-bold px-4 py-2 rounded-full shadow-lg border-2 border-natgeo-blue hover:bg-natgeo-blue hover:text-white transition duration-150">
+                        สมาชิกกลุ่ม (Group 10 Member)
+                    </button>
+                </div>
+                <!-- Mobile Menu Button -->
+                <div class="-mr-2 flex items-center sm:hidden">
+                    <button id="mobile-menu-btn" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-natgeo-blue hover:text-white hover:bg-natgeo-blue focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div class="sm:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <button onclick="navigateTo('home')" class="text-left w-full bg-natgeo-blue text-white block px-3 py-2 rounded-md text-base font-medium">หน้าแรก (Home)</button>
+                <button onclick="navigateTo('home', 'about')" class="text-left w-full text-natgeo-blue hover:bg-blue-100 block px-3 py-2 rounded-md text-base font-medium">แผ่นน้ำแข็ง (The Ice Sheet)</button>
+                <div class="text-natgeo-blue px-3 py-2 font-bold">สิ่งมีชีวิต:</div>
+                <button onclick="navigateTo('seal')" class="text-left w-full text-natgeo-blue hover:bg-blue-100 block pl-8 pr-3 py-1 rounded-md text-sm font-medium">-- แมวน้ำ (Seal)</button>
+                <button onclick="navigateTo('polarbear')" class="text-left w-full text-natgeo-blue hover:bg-blue-100 block pl-8 pr-3 py-1 rounded-md text-sm font-medium">-- หมีขั้วโลก (Polar Bear)</button>
+                <button onclick="navigateTo('penguin')" class="text-left w-full text-natgeo-blue hover:bg-blue-100 block pl-8 pr-3 py-1 rounded-md text-sm font-medium">-- เพนกวิน (Penguin)</button>
+                <button onclick="navigateTo('orca')" class="text-left w-full text-natgeo-blue hover:bg-blue-100 block pl-8 pr-3 py-1 rounded-md text-sm font-medium">-- วาฬเพชฌฆาต (Orca)</button>
+                <button onclick="navigateTo('misc')" class="text-left w-full text-natgeo-blue hover:bg-blue-100 block pl-8 pr-3 py-1 rounded-md text-sm font-medium">-- เบ็ดเตล็ด (Misc.)</button>
+                <button onclick="navigateTo('group')" class="text-left w-full text-natgeo-blue hover:bg-blue-100 block px-3 py-2 rounded-md text-base font-medium">สมาชิกกลุ่ม (Group 10 Member)</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- =========================================================================
+         2. CONTENT SECTIONS
+    ========================================================================= -->
+
+    <!-- *** PAGE: HOME *** -->
+    <section id="page-home" class="page-section active-section flex-grow">
+        <header id="home-top" class="hero-bg h-[80vh] min-h-[500px] flex items-center justify-center rounded-b-2xl shadow-xl">
+            <div class="hero-overlay absolute inset-0 rounded-b-2xl"></div>
+            <div class="relative text-center p-6 md:p-12">
+                <h1 class="text-5xl md:text-7xl lg:text-8xl font-black text-white leading-tight mb-4 tracking-tighter drop-shadow-lg">
+                    ดินแดนน้ำแข็งสุดขอบโลก
+                </h1>
+                <p class="text-xl md:text-2xl text-white font-light drop-shadow-md italic">
+                    การเดินทางสู่ดินแดนที่หนาวที่สุดและสิ่งมีชีวิตในนั้น
+                </p>
+                <button onclick="scrollToSection('wildlife-home')" class="mt-8 inline-block bg-white text-natgeo-blue font-bold text-lg px-8 py-3 rounded-full shadow-2xl transition duration-300 transform hover:scale-105 hover:shadow-3xl">
+                    สำรวจสิ่งมีชีวิต
+                </button>
+            </div>
+        </header>
+
+        <section id="about" class="py-16 md:py-24 bg-ice-blue-light">
+            <div class="max-w-6xl mx-auto px-6 lg:px-8">
+                <h2 class="text-5xl font-extrabold text-center mb-12 text-natgeo-blue">
+                    แอนตาร์กติกา: ทวีปสีขาวอันยิ่งใหญ่
+                </h2>
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="order-2 md:order-1">
+                        <p class="mt-4 text-xl leading-relaxed text-gray-700 border-l-4 border-natgeo-blue pl-4">
+                            แอนตาร์กติกาคือดินแดนที่รวมเอาที่สุดของโลกไว้ด้วยกัน: หนาวที่สุด แห้งแล้งที่สุด และลมแรงที่สุด ครอบคลุมพื้นที่กว่า 90% ของน้ำแข็งทั่วโลก และถูกจัดให้เป็นทะเลทรายเนื่องจากปริมาณน้ำฝนที่น้อยมาก โลกน้ำแข็งอันกว้างใหญ่นี้หล่อเลี้ยงระบบนิเวศที่มีเอกลักษณ์และปรับตัวให้เข้ากับสภาพแวดล้อมที่โหดร้ายได้อย่างสมบูรณ์
+                        </p>
+                        <p class="mt-6 text-lg text-gray-600">
+                            สิ่งมีชีวิตส่วนใหญ่อาศัยอยู่ตามแนวชายฝั่งและมหาสมุทรโดยรอบ ซึ่งเป็นที่ที่เคยลช์ (Krill) ซึ่งเป็นสปีชีส์สำคัญ เจริญเติบโตได้อย่างดี เป็นแหล่งอาหารสำคัญของวาฬ แมวน้ำ และเพนกวินจำนวนมหาศาล ภารกิจสำรวจของเรามีเป้าหมายเพื่อบันทึกความยืดหยุ่นและความงดงามของสิ่งมีชีวิตเหล่านี้ ท่ามกลางสภาพแวดล้อมที่เปลี่ยนแปลงไป
+                        </p>
+                        <div class="mt-8 flex space-x-4">
+                            <span class="text-sm font-semibold text-natgeo-blue border-b-2 border-natgeo-blue pb-1">พื้นที่: 14 ล้าน ตร.กม.</span>
+                            <span class="text-sm font-semibold text-natgeo-blue border-b-2 border-natgeo-blue pb-1">อุณหภูมิต่ำสุด: -89.2°C</span>
+                        </div>
+                    </div>
+                    <div class="order-1 md:order-2">
+                        <img src="https://everwallpaper.com/cdn/shop/products/3000_1000_90b86d96-e865-43bb-98e2-9902566ac5b7.webp?v=1655282003" 
+                             alt="Icebergs in Antarctica" 
+                             class="rounded-xl shadow-2xl border-4 border-white transform hover:rotate-1 transition duration-500">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="wildlife-home" class="py-16 md:py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-6 lg:px-8">
+                <h2 class="text-5xl font-extrabold text-center mb-4 text-natgeo-blue">
+                    สัตว์เด่นแห่งแอนตาร์กติก
+                </h2>
+                <p class="text-center text-xl text-gray-500 mb-16">
+                    พบกับผู้พำนักอันมีเสน่ห์แห่งมหาสมุทรใต้
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                    <div class="bg-white rounded-xl shadow-2xl overflow-hidden card-image-container border-b-8 border-natgeo-blue">
+                        <div class="card-image-wrapper">
+                            <img src="https://www.antarctica.gov.au/site/assets/files/67447/rs76474.1600x0.jpg" class="card-image">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-3xl font-bold text-natgeo-blue mb-2">Emperor Penguin</h3>
+                            <p class="text-gray-600 text-lg">
+                                เพนกวินชนิดนี้เป็นชนิดที่สูงและหนักที่สุดในบรรดาเพนกวินทั้งหมด เป็นสัตว์พื้นเมืองของทวีปแอนตาร์กติกา พวกมันจะผสมพันธุ์ในช่วงฤดูหนาว และเดินทางไกลถึง 120 ไมล์ไปยังอาณานิคมบนผืนน้ำแข็ง
+                            </p>
+                            <button onclick="navigateTo('penguin')" class="mt-4 inline-block text-natgeo-blue font-semibold hover:underline flex items-center">อ่านเพิ่มเติมในหน้าเพนกวิน <span class="ml-1 text-xl">→</span></button>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-2xl overflow-hidden card-image-container border-b-8 border-natgeo-blue">
+                        <div class="card-image-wrapper">
+                            <img src="https://cdn.shopify.com/s/files/1/0996/1022/files/8_fcef39e2-ffcf-4e99-8c6d-c8cb5b6ab42f.jpg?v=1737648048&width=2048" class="card-image">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-3xl font-bold text-natgeo-blue mb-2">Harp Seal</h3>
+                            <p class="text-gray-600 text-lg">
+                                แมวน้ำ Harp (Harp Seal) โดดเด่นด้วยขนสีขาวบริสุทธิ์เมื่อยังเป็นลูกอ่อน และมีเครื่องหมายรูปพิณสีดำเมื่อโตเต็มวัค พวกมันอพยพเป็นระยะทางไกลและมีความสำคัญต่อระบบนิเวศของมหาสมุทรแอตแลนติกเหนือ
+                            </p>
+                            <button onclick="navigateTo('seal')" class="mt-4 inline-block text-natgeo-blue font-semibold hover:underline flex items-center">อ่านเพิ่มเติมในหน้าแมวน้ำ <span class="ml-1 text-xl">→</span></button>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow-2xl overflow-hidden card-image-container border-b-8 border-natgeo-blue">
+                        <div class="card-image-wrapper">
+                            <img src="https://a-z-animals.com/media/2022/09/shutterstock_1635615292-1024x762.jpg" class="card-image">
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-3xl font-bold text-natgeo-blue mb-2">วาฬเพชฌฆาต (Orcas)</h3>
+                            <p class="text-gray-600 text-lg">
+                                เป็นนักล่าสูงสุดแห่งมหาสมุทรใต้ มีกลยุทธ์การล่าที่ซับซ้อนและโครงสร้างทางสังคมที่ซับซ้อน วาฬเพชฌฆาต 'Type B' เชี่ยวชาญในการล่าแมวน้ำจากแผ่นน้ำแข็ง
+                            </p>
+                            <button onclick="navigateTo('orca')" class="mt-4 inline-block text-natgeo-blue font-semibold hover:underline flex items-center">อ่านเพิ่มเติมในหน้าวาฬ <span class="ml-1 text-xl">→</span></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <!-- *** PAGE: SEAL *** -->
+    <section id="page-seal" class="page-section hidden-section flex-grow">
+        <header class="hero-bg-seal h-[50vh] min-h-[300px] flex items-center justify-center shadow-xl">
+            <div class="hero-overlay absolute inset-0"></div>
+            <div class="relative text-center p-6 md:p-12">
+                <h1 class="text-5xl md:text-7xl font-black text-white leading-tight mb-4 tracking-tighter drop-shadow-lg">
+                    แมวน้ำแห่งแอนตาร์กติกา
+                </h1>
+                <p class="text-xl md:text-2xl text-white font-light drop-shadow-md italic">
+                    The Ice Dwellers: Masters of the Southern Ocean
+                </p>
+            </div>
+        </header>
+        <main class="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+            <h2 class="text-4xl font-extrabold text-center mb-12 text-natgeo-blue border-b-4 border-ice-blue pb-4">
+                Three Remarkable Species | สามสายพันธุ์ที่น่าทึ่ง
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <!-- Weddell -->
+                <div class="bg-white rounded-xl shadow-2xl overflow-hidden card-item border-b-8 border-natgeo-blue hover:shadow-3xl transition duration-300">
+                    <div class="overflow-hidden"><img src="https://www.coolantarctica.com/Antarctica%20fact%20file/wildlife/wedd-pup-sing.webp" class="card-image-seal"></div>
+                    <div class="p-6">
+                        <h3 class="text-3xl font-bold text-natgeo-blue mb-3">Weddell Seal</h3>
+                        <p class="text-gray-600 mb-4">
+                            **English:** These are known for their impressive underwater vocalizations and ability to dive deep beneath the ice, often found near breathing holes in the thick fast ice.
+                        </p>
+                        <p class="text-natgeo-blue font-medium mb-4 border-t pt-4">
+                            **Thai (ไทย):** มีชื่อเสียงจากการส่งเสียงร้องใต้น้ำที่น่าทึ่งและความสามารถในการดำน้ำลึกใต้ผืนน้ำแข็งที่หนา พวกมันมักจะถูกพบใกล้กับรูหายใจ
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-gray-200">
+                            <p class="text-sm text-gray-700 font-semibold mb-1"><strong>Estimated Population:</strong> ~800,000</p>
+                            <button onclick="openModal('weddell')" class="text-natgeo-blue font-medium hover:underline flex items-center">View Research Log / ดูบันทึก →</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Harp -->
+                <div class="bg-white rounded-xl shadow-2xl overflow-hidden card-item border-b-8 border-natgeo-blue hover:shadow-3xl transition duration-300">
+                    <div class="overflow-hidden"><img src="https://cdn.shopify.com/s/files/1/0996/1022/files/8_fcef39e2-ffcf-4e99-8c6d-c8cb5b6ab42f.jpg?v=1737648048&width=2048" class="card-image-seal"></div>
+                    <div class="p-6">
+                        <h3 class="text-3xl font-bold text-natgeo-blue mb-3">Harp Seal</h3>
+                        <p class="text-gray-600 mb-4">
+                            **English:** Famous for their pure white pups, Harp seals are highly migratory and found primarily in the Arctic and North Atlantic, known for their large population.
+                        </p>
+                        <p class="text-natgeo-blue font-medium mb-4 border-t pt-4">
+                            **Thai (ไทย):** มีชื่อเสียงจากลูกแมวน้ำที่มีขนสีขาวบริสุทธิ์ แมวน้ำพิณมีการอพยพสูงและพบในอาร์กติกและแอตแลนติกเหนือเป็นหลัก
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-gray-200">
+                            <p class="text-sm text-gray-700 font-semibold mb-1"><strong>Population Estimate:</strong> 7.6 million</p>
+                            <button onclick="openModal('harp')" class="text-natgeo-blue font-medium hover:underline flex items-center">Explore Migration Routes / ดูเส้นทาง →</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Leopard -->
+                <div class="bg-white rounded-xl shadow-2xl overflow-hidden card-item border-b-8 border-natgeo-blue hover:shadow-3xl transition duration-300">
+                    <div class="overflow-hidden"><img src="https://www.voyagers.travel/_ipx/w_2400&f_webp&q_85/google/travel-web-app-1.appspot.com/flamelink/media/Leopard%20Seal%20-%20Canva%20-%20Gerald%20%20Corsi.jpg%3Falt=media" class="card-image-seal"></div>
+                    <div class="p-6">
+                        <h3 class="text-3xl font-bold text-natgeo-blue mb-3">Leopard Seal</h3>
+                        <p class="text-gray-600 mb-4">
+                            **English:** The apex predator of the Antarctic, known for its powerful jaws and distinctive spotted coat. It is the only seal that preys on warm-blooded animals, including penguins.
+                        </p>
+                        <p class="text-natgeo-blue font-medium mb-4 border-t pt-4">
+                            **Thai (ไทย):** นักล่าอันดับสูงสุดของแอนตาร์กติกา มีชื่อเสียงด้านกรามที่แข็งแกร่งและลวดลายจุดที่โดดเด่น เป็นแมวน้ำชนิดเดียวที่ล่าสัตว์เลือดอุ่น เช่น เพนกวิน
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-gray-200">
+                            <p class="text-sm text-gray-700 font-semibold mb-1"><strong>Population Estimate:</strong> 220,000 - 440,000</p>
+                            <button onclick="openModal('leopard')" class="text-natgeo-blue font-medium hover:underline flex items-center">Predatory Behavior / รายงานการล่า →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </section>
+
+    <!-- *** PAGE: POLAR BEAR *** -->
+    <section id="page-polarbear" class="page-section hidden-section flex-grow">
+        <header class="hero-bg-polar h-[50vh] min-h-[300px] flex items-center justify-center shadow-xl">
+            <div class="hero-overlay absolute inset-0"></div>
+            <div class="relative text-center p-6 md:p-12">
+                <h1 class="text-5xl md:text-7xl font-black text-white leading-tight mb-4 tracking-tighter drop-shadow-lg">
+                    หมีขั้วโลก: ผู้ล่าแห่งอาร์กติก
+                </h1>
+                <p class="text-xl md:text-2xl text-white font-light drop-shadow-md italic">
+                    Arctic Predator: Why They Don't Live in Antarctica
+                </p>
+            </div>
+        </header>
+        <main class="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+            <div class="grid lg:grid-cols-3 gap-10">
+                <div class="lg:col-span-2">
+                    <h3 class="text-3xl font-bold text-natgeo-blue mb-4">หมีขั้วโลกไม่ใช่ผู้พำนักแห่งแอนตาร์กติกา</h3>
+                    <p class="text-lg text-gray-700 mb-6">
+                        **English (Description):** Polar bears are the largest land carnivores and are strictly confined to the Arctic region (North Pole), living across the ice floes and coastlines of North America, Europe, and Asia. A common misconception is that they share territory with penguins in the South Pole, but they are separated by thousands of miles of ocean and different ecological zones.
+                    </p>
+                    <p class="text-lg text-natgeo-blue font-medium mb-8 border-l-4 border-natgeo-blue pl-4 bg-ice-blue-light p-4 rounded-lg">
+                        **Thai (รายละเอียด):** หมีขั้วโลกเป็นสัตว์กินเนื้อบนบกที่ใหญ่ที่สุดและถูกจำกัดพื้นที่เฉพาะในเขตอาร์กติก (ขั้วโลกเหนือ) เท่านั้น โดยอาศัยอยู่ตามแผ่นน้ำแข็งและชายฝั่งของทวีปอเมริกาเหนือ ยุโรป และเอเชีย เป็นความเข้าใจผิดที่มักเกิดขึ้นว่าพวกมันอาศัยอยู่ร่วมกับเพนกวินที่ขั้วโลกใต้ ซึ่งความเป็นจริงแล้วพวกมันถูกคั่นด้วยมหาสมุทรหลายพันไมล์
+                    </p>
+                    
+                    <h3 class="text-3xl font-bold text-natgeo-blue mb-4 mt-8">การปรับตัวเพื่อความอยู่รอดในโลกน้ำแข็ง</h3>
+                    <p class="text-lg text-gray-700 mb-4">
+                        Polar bears are supremely adapted for life in the extreme cold. Their thick layer of blubber provides insulation, while their dense underfur and guard hairs, which appear white, are actually translucent and scatter light, providing camouflage. They are powerful swimmers, capable of maintaining a four-mile-per-hour pace, crucial for hunting their primary prey: seals.
+                    </p>
+                    <p class="text-lg text-gray-700 mb-8">
+                        **Thai (เชิงลึก):** หมีขั้วโลกมีการปรับตัวอย่างยอดเยี่ยมสำหรับชีวิตในสภาพอากาศหนาวจัด ชั้นไขมันหนาช่วยเป็นฉนวนกันความร้อน ขณะที่ขนหนาแน่นของพวกมันช่วยพรางตัว พวกมันเป็นนักว่ายน้ำที่แข็งแกร่ง สามารถรักษาระดับความเร็วได้ดี ซึ่งสำคัญอย่างยิ่งสำหรับการล่าเหยื่อหลักคือแมวน้ำ
+                    </p>
+
+                    <div class="aspect-w-16 aspect-h-9 mb-6 bg-gray-900 rounded-xl shadow-2xl overflow-hidden">
+                        <iframe class="w-full h-96 rounded-lg" src="https://www.youtube.com/embed/D6_e6yKH26Q?autoplay=0&rel=0" allowfullscreen></iframe>
+                    </div>
+                </div>
+                <div class="lg:col-span-1 bg-white p-8 rounded-xl shadow-2xl h-fit border-t-8 border-natgeo-blue">
+                    <h3 class="text-3xl font-bold text-natgeo-blue mb-6">เกร็ดน่ารู้ (Fun Facts)</h3>
+                    <ul class="space-y-4 text-gray-700">
+                        <li class="flex items-start">
+                            <span class="text-xl text-natgeo-blue font-extrabold mr-3">1.</span>
+                            <div><strong class="text-gray-900">ผิวสีดำ:</strong> ใต้ขนที่หนาแน่นของพวกมัน หมีขั้วโลกมีผิวหนังสีดำ ซึ่งช่วยให้พวกมันดูดซับรังสีดวงอาทิตย์ได้สูงสุด</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-xl text-natgeo-blue font-extrabold mr-3">2.</span>
+                            <div><strong class="text-gray-900">ไม่ได้มีขนสีขาว:</strong> ขนของพวกมันไม่ใช่สีขาว ขนแต่ละเส้นมีลักษณะโปร่งใสและกลวง สะท้อนแสงจนเกิดภาพลวงตาว่าขาว</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-xl text-natgeo-blue font-extrabold mr-3">3.</span>
+                            <div><strong class="text-gray-900">อุ้งมือผิวคลายพื้นรองเท้า:</strong> อุ้งเท้าขนาดใหญ่ของพวกมันสามารถวัดได้กว้างถึง 12 นิ้ว ทำหน้าที่เหมือนรองเท้าเดินหิมะและยึดเกาะบนน้ำแข็งได้ดีเยี่ยม</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-xl text-natgeo-blue font-extrabold mr-3">4.</span>
+                            <div><strong class="text-gray-900">ไม่เคยจำศีล:</strong> มีเพียงหมีขาวตัวเมียที่ตั้งท้องเท่านั้นที่จะเข้าไปในถ้ำในช่วงที่ไม่มีกิจกรรมใดๆ ในขณะที่หมีขาวตัวผู้และตัวเมียที่ไม่ตั้งท้องจะล่าสัตว์ตลอดทั้งปี</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </section>
+
+    <!-- *** PAGE: PENGUIN *** -->
+    <section id="page-penguin" class="page-section hidden-section flex-grow">
+        <header class="hero-bg-penguin h-[50vh] min-h-[300px] flex items-center justify-center shadow-xl">
+            <div class="hero-overlay absolute inset-0"></div>
+            <div class="relative text-center p-6 md:p-12">
+                <h1 class="text-5xl md:text-7xl font-black text-white leading-tight mb-4 tracking-tighter drop-shadow-lg">
+                    เพนกวินแห่งแอนตาร์กติกา
+                </h1>
+                <p class="text-xl md:text-2xl text-white font-light drop-shadow-md italic">
+                    The Southern Stars: Life in the World's Coldest Oceans
+                </p>
+            </div>
+        </header>
+        <main class="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+            <h2 class="text-4xl font-extrabold text-center mb-12 text-natgeo-blue border-b-4 border-ice-blue pb-4">
+                Three Key Antarctic Species | สามสายพันธุ์หลักแห่งแอนตาร์กติกา
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <!-- Emperor -->
+                <div class="bg-white rounded-xl shadow-2xl overflow-hidden card-item border-b-8 border-natgeo-blue">
+                    <div class="overflow-hidden"><img src="https://www.antarctica.gov.au/site/assets/files/67447/rs76474.1600x0.jpg" class="card-image-penguin"></div>
+                    <div class="p-6">
+                        <h3 class="text-3xl font-bold text-natgeo-blue mb-3">Emperor Penguin</h3>
+                        <p class="text-gray-600 mb-4">
+                            **English:** The largest and deepest diving of all penguins. They are known for breeding in the harshest conditions of the Antarctic winter.
+                        </p>
+                        <p class="text-natgeo-blue font-medium mb-4 border-t pt-4">
+                            **Thai (ไทย):** เพนกวินที่ตัวใหญ่ที่สุดและดำน้ำได้ลึกที่สุด มีชื่อเสียงจากการผสมพันธุ์ในฤดูหนาวที่รุนแรงของแอนตาร์กติกา
+                        </p>
+                        <button onclick="openModal('emperor')" class="text-natgeo-blue font-medium hover:underline">ข้อมูลเชิงลึก →</button>
+                    </div>
+                </div>
+                <!-- Adelie -->
+                <div class="bg-white rounded-xl shadow-2xl overflow-hidden card-item border-b-8 border-natgeo-blue">
+                    <div class="overflow-hidden"><img src="https://polar-latitudes.com/wp-content/uploads/2021/06/Brown-Bluff-Antarctic-Sound-Philip-Stone-8508930-copy-scaled.jpg" class="card-image-penguin"></div>
+                    <div class="p-6">
+                        <h3 class="text-3xl font-bold text-natgeo-blue mb-3">Adélie Penguin</h3>
+                        <p class="text-gray-600 mb-4">
+                            **English:** Small, feisty, and one of the most widely distributed species. Adélies are famous for their rock-piling nests and aggressive colony behavior.
+                        </p>
+                        <p class="text-natgeo-blue font-medium mb-4 border-t pt-4">
+                            **Thai (ไทย):** เพนกวินตัวเล็ก มีความกล้าหาญ และเป็นหนึ่งในสายพันธุ์ที่แพร่หลายที่สุด มีชื่อเสียงจากการสร้างรังด้วยก้อนหิน
+                        </p>
+                        <button onclick="openModal('adelie')" class="text-natgeo-blue font-medium hover:underline">ข้อมูลเชิงลึก →</button>
+                    </div>
+                </div>
+                <!-- Gentoo -->
+                <div class="bg-white rounded-xl shadow-2xl overflow-hidden card-item border-b-8 border-natgeo-blue">
+                    <div class="overflow-hidden"><img src="https://www.antarctica.gov.au/site/assets/files/45561/rs35470_dsc_4869.1600x0.jpg" class="card-image-penguin"></div>
+                    <div class="p-6">
+                        <h3 class="text-3xl font-bold text-natgeo-blue mb-3">Gentoo Penguin</h3>
+                        <p class="text-gray-600 mb-4">
+                            **English:** Recognized by the white stripe across their heads, Gentoos are the fastest swimming penguin species and build the largest rock nests.
+                        </p>
+                        <p class="text-natgeo-blue font-medium mb-4 border-t pt-4">
+                            **Thai (ไทย):** โดดเด่นด้วยแถบสีขาวพาดผ่านศีรษะ เป็นเพนกวินที่ว่ายน้ำได้เร็วที่สุด และสร้างรังหินที่ใหญ่ที่สุด
+                        </p>
+                        <button onclick="openModal('gentoo')" class="text-natgeo-blue font-medium hover:underline">ข้อมูลเชิงลึก →</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </section>
+
+    <!-- *** PAGE: ORCA *** -->
+    <section id="page-orca" class="page-section hidden-section flex-grow">
+        <header class="hero-bg-orca h-[50vh] min-h-[300px] flex items-center justify-center shadow-xl">
+            <div class="hero-overlay absolute inset-0"></div>
+            <div class="relative text-center p-6 md:p-12">
+                <h1 class="text-5xl md:text-7xl font-black text-white leading-tight mb-4 tracking-tighter drop-shadow-lg">
+                    วาฬเพชฌฆาต
+                </h1>
+                <p class="text-xl md:text-2xl text-white font-light drop-shadow-md italic">
+                    The Killer Whale: Apex Predator of the Southern Ocean
+                </p>
+            </div>
+        </header>
+        <main class="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+            <div class="grid lg:grid-cols-3 gap-10">
+                <div class="lg:col-span-2">
+                    <h3 class="text-3xl font-bold text-natgeo-blue mb-4">สังคมวาฬเพชฌฆาต</h3>
+                    <p class="text-lg text-gray-700 mb-6">
+                        **English (Description):** Killer whales (or Orca) are the largest of the dolphins. They live in stable family pods led by females and exhibit the most complex social structure of all marine mammals. Antarctic subspecies, such as Type B (B1 and B2), rely on specialized hunting techniques learned within the pod.
+                    </p>
+                    <p class="text-lg text-natgeo-blue font-medium mb-8 border-l-4 border-natgeo-blue pl-4 bg-ice-blue-light p-4 rounded-lg">
+                        **Thai (รายละเอียด):** วาฬเพชฌฆาต (แม้ชื่อสามัญจะเรียกว่าปลาวาฬเพชฌฆาต) คือโลมาที่มีขนาดใหญ่ที่สุด พวกมันอาศัยอยู่เป็นฝูงครอบครัวที่มั่นคงซึ่งนำโดยตัวเมีย และแสดงโครงสร้างทางสังคมที่ซับซ้อนที่สุดในบรรดาสัตว์เลี้ยงลูกด้วยนมในทะเลทั้งหมด กลุ่มย่อยในแอนตาร์กติกา เช่น Type B (B1 และ B2) พึ่งพาเทคนิคการล่าเฉพาะทางที่เรียนรู้กันในฝูง
+                    </p>
+                    <h3 class="text-3xl font-bold text-natgeo-blue mb-4 mt-8">กลยุทธ์การล่าที่โด่งดัง: การสร้างคลื่นยักษ์</h3>
+                    <p class="text-lg text-gray-700 mb-4">
+                        The most famous Antarctic hunting tactic is "wave washing." A coordinated group of Type B orcas will swim rapidly in a line towards an ice floe where a seal or penguin is resting. Their synchronized movement generates a large, powerful wave that washes the prey off the ice and into the water, where they can be captured. This shows incredible coordination, communication, and planning.
+                    </p>
+                    <p class="text-lg text-gray-700 mb-8">
+                        **Thai (เชิงลึก):** กลยุทธ์การล่าที่โด่งดังที่สุดในแอนตาร์กติกาคือ "การสร้างคลื่นชะล้าง" วาฬเพชฌฆาต Type B จะประสานงานกันว่ายน้ำอย่างรวดเร็วเป็นแนวตรงมุ่งหน้าไปยังแผ่นน้ำแข็งที่มีแมวน้ำหรือเพนกวินพักอยู่ การเคลื่อนไหวที่พร้อมเพรียงกันนี้จะสร้างคลื่นขนาดใหญ่และทรงพลัง เพื่อชะล้างเหยื่อให้ตกลงไปในน้ำ แสดงให้เห็นถึงการประสานงาน การสื่อสาร และการวางแผนที่ยอดเยี่ยม
+                    </p>
+                    <div class="aspect-w-16 aspect-h-9 mb-6 bg-gray-900 rounded-xl shadow-2xl overflow-hidden">
+                        <iframe class="w-full h-96 rounded-lg" src="https://www.youtube.com/embed/3DkEePjRP04?autoplay=0&rel=0" allowfullscreen></iframe>
+                    </div>
+                </div>
+                <div class="lg:col-span-1 bg-white p-8 rounded-xl shadow-2xl h-fit border-t-8 border-natgeo-blue">
+                    <h3 class="text-3xl font-bold text-natgeo-blue mb-6">เกร็ดน่ารู้</h3>
+                    <ul class="space-y-4 text-gray-700">
+                        <li class="flex items-start">
+                            <span class="text-xl text-natgeo-blue font-extrabold mr-3">1.</span>
+                            <div><strong class="text-gray-900">อาหารที่หลากหลาย:</strong> วาฬเพชฌฆาตแต่ละกลุ่มย่อย (เช่น กลุ่มประจำถิ่น, กลุ่มอพยพ) มีอาหารที่เชี่ยวชาญเฉพาะทาง</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-xl text-natgeo-blue font-extrabold mr-3">2.</span>
+                            <div><strong class="text-gray-900">อายุยืนยาว:</strong> วาฬเพชฌฆาตตัวเมียสามารถมีชีวิตอยู่ได้นานถึง 90 ปี ซึ่งใกล้เคียงกับอายุขัยของผู้หญิง และยังคงเป็นผู้นำฝูงได้แม้จะหยุดสืบพันธุ์แล้วก็ตาม</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-xl text-natgeo-blue font-extrabold mr-3">3.</span>
+                            <div><strong class="text-gray-900">การสื่อสารที่เป็นเอกลักษณ์:</strong> แต่ละฝูงมีชุดเสียงเรียกและสำเนียงการสื่อสารเฉพาะตัว ทำหน้าที่เป็นเหมือนวัฒนธรรมที่ถ่ายทอดจากรุ่นสู่รุ่น</div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-xl text-natgeo-blue font-extrabold mr-3">4.</span>
+                            <div><strong class="text-gray-900">สีของ Type B:</strong> วาฬเพชฌฆาต Type B ในแอนตาร์กติกมีสีออกเหลืองจางๆ ซึ่งเกิดจากสาหร่ายขนาดเล็ก (Diatoms) ที่อาศัยอยู่ในน้ำที่หนาวจัด</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </section>
+
+    <!-- *** PAGE: MISC *** -->
+    <section id="page-misc" class="page-section hidden-section flex-grow">
+        <header class="hero-bg-misc h-[50vh] min-h-[300px] flex items-center justify-center shadow-xl">
+            <div class="hero-overlay absolute inset-0"></div>
+            <div class="relative text-center p-6 md:p-12">
+                <h1 class="text-5xl md:text-7xl font-black text-white leading-tight mb-4 tracking-tighter drop-shadow-lg">
+                    สิ่งมีชีวิตเบ็ดเตล็ด
+                </h1>
+            </div>
+        </header>
+        <main class="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <!-- Krill -->
+                <div class="bg-white rounded-xl shadow-2xl overflow-hidden card-item border-b-8 border-natgeo-blue">
+                    <div class="overflow-hidden"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c7/Antarctic_krill_%28Euphausia_superba%29.jpg" class="card-image-misc"></div>
+                    <div class="p-6">
+                        <h3 class="text-3xl font-bold text-natgeo-blue mb-3">Antarctic Krill</h3>
+                        <p class="text-gray-600 mb-4">
+                            **English:** A small crustacean forming the bedrock of the entire Southern Ocean food web. Almost all large marine predators rely on krill.
+                        </p>
+                        <p class="text-natgeo-blue font-medium mb-4 border-t pt-4">
+                            **Thai (ไทย):** สัตว์เปลือกแข็งขนาดเล็กซึ่งเป็นรากฐานของห่วงโซ่อาหารทั้งหมดในมหาสมุทรใต้ สัตว์ผู้ล่าขนาดใหญ่เกือบทั้งหมดต้องพึ่งพาเคยลช์
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-gray-200">
+                            <p class="text-sm text-gray-700 font-semibold mb-1"><strong>Biomass:</strong> Hundreds of millions of tons</p>
+                            <button onclick="openModal('krill')" class="text-natgeo-blue font-medium hover:underline">ข้อมูลเชิงลึก →</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Icefish -->
+                <div class="bg-white rounded-xl shadow-2xl overflow-hidden card-item border-b-8 border-natgeo-blue">
+                    <div class="overflow-hidden"><img src="https://static01.nyt.com/images/2019/03/05/science/01TB-ICEFISH1/merlin_151394277_e8a44527-1cab-4e45-81f5-5e7ffa3f5952-superJumbo.jpg" class="card-image-misc"></div>
+                    <div class="p-6">
+                        <h3 class="text-3xl font-bold text-natgeo-blue mb-3">Icefish</h3>
+                        <p class="text-gray-600 mb-4">
+                            **English:** Famous for being the only vertebrate animal known to lack hemoglobin (red blood cells). They rely entirely on dissolved oxygen in the icy water.
+                        </p>
+                        <p class="text-natgeo-blue font-medium mb-4 border-t pt-4">
+                            **Thai (ไทย):** มีชื่อเสียงจากการเป็นสัตว์มีกระดูกสันหลังเพียงชนิดเดียวที่ไม่มีฮีโมโกลบิน (เม็ดเลือดแดง) พวกมันพึ่งพาออกซิเจนที่ละลายในน้ำแข็งเท่านั้น
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-gray-200">
+                            <p class="text-sm text-gray-700 font-semibold mb-1"><strong>Adaptation:</strong> Antifreeze proteins</p>
+                            <button onclick="openModal('icefish')" class="text-natgeo-blue font-medium hover:underline">ข้อมูลเชิงลึก →</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Squid -->
+                <div class="bg-white rounded-xl shadow-2xl overflow-hidden card-item border-b-8 border-natgeo-blue">
+                    <div class="overflow-hidden"><img src="https://i.natgeofe.com/n/9e35946e-b9bb-431f-887f-399983ac02e1/BMM24017_02_PerpetualPlanetExpeditions_Southern_ROV_7.jpg" class="card-image-misc"></div>
+                    <div class="p-6">
+                        <h3 class="text-3xl font-bold text-natgeo-blue mb-3">Colossal Squid</h3>
+                        <p class="text-gray-600 mb-4">
+                            **English:** The largest known invertebrate, with eyes the size of dinner plates. It is a deep-sea predator and a primary food source for sperm whales.
+                        </p>
+                        <p class="text-natgeo-blue font-medium mb-4 border-t pt-4">
+                            **Thai (ไทย):** สัตว์ไม่มีกระดูกสันหลังที่ใหญ่ที่สุดเท่าที่รู้จัก โดยมีดวงตาขนาดเท่าจานอาหาร เป็นนักล่าที่อาศัยอยู่ในทะเลลึกและเป็นอาหารหลักของวาฬสเปิร์ม
+                        </p>
+                        <div class="mt-auto pt-4 border-t border-gray-200">
+                            <p class="text-sm text-gray-700 font-semibold mb-1"><strong>Max Length:</strong> ~14 meters</p>
+                            <button onclick="openModal('squid')" class="text-natgeo-blue font-medium hover:underline">ข้อมูลเชิงลึก →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </section>
+
+    <!-- *** PAGE: GROUP *** -->
+    <section id="page-group" class="page-section hidden-section flex-grow">
+        <header class="hero-bg-members h-[50vh] min-h-[300px] flex items-center justify-center shadow-xl">
+            <div class="hero-overlay absolute inset-0"></div>
+            <div class="relative text-center p-6 md:p-12">
+                <h1 class="text-5xl md:text-7xl font-black text-white leading-tight mb-4 tracking-tighter drop-shadow-lg">
+                    สมาชิกกลุ่ม (Group 10 Member)
+                </h1>
+                <p class="text-xl md:text-2xl text-white font-light drop-shadow-md italic">
+                    ผู้ริเริ่มและผู้อยู่เบื้องหลังการทำเว็ปไซต์นี้
+                </p>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+            <h2 class="text-4xl font-extrabold text-center mb-12 text-natgeo-blue border-b-4 border-ice-blue pb-4">
+                The Dedicated Team | ทีมงานผู้มุ่งมั่น
+            </h2>
+
+            <!-- Horizontal Grid Layout (Restored) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+                
+                <!-- Member 1: Project Manager -->
+                <div class="bg-white rounded-xl shadow-2xl overflow-hidden member-card border-t-8 border-natgeo-blue">
+                    <img src="https://placehold.co/400x400/004680/E6F7FF?text=Watcharapakron" class="member-photo" alt="mem1">
+                    <div class="p-4 text-center">
+                        <span class="inline-block bg-blue-100 text-natgeo-blue text-[10px] px-2 py-1 rounded-full mb-2 font-bold uppercase tracking-wide">Project Manager & Fullstack Dev</span>
+                        <h3 class="text-lg font-bold text-natgeo-blue mb-1">นายวัชรปกรณ์ โพธิ์พา</h3>
+                        <p class="text-xs text-gray-500 font-mono">ID: 68063361</p>
+                    </div>
+                </div>
+
+                <!-- Member 2: Presenter -->
+                <div class="bg-white rounded-xl shadow-2xl overflow-hidden member-card border-t-8 border-natgeo-blue">
+                    <img src="https://placehold.co/400x400/E6F7FF/004680?text=N/A" class="member-photo" alt="mem2">
+                    <div class="p-4 text-center">
+                        <span class="inline-block bg-gray-100 text-gray-600 text-[10px] px-2 py-1 rounded-full mb-2 font-semibold">Presenter & InfoGraphic Designer</span>
+                        <h3 class="text-lg font-bold text-natgeo-blue mb-1">N/A</h3>
+                        <p class="text-xs text-gray-500 font-mono">ID: N/A</p>
+                    </div>
+                </div>
+
+                <!-- Member 3: Researcher -->
+                <div class="bg-white rounded-xl shadow-2xl overflow-hidden member-card border-t-8 border-natgeo-blue">
+                    <img src="https://placehold.co/400x400/E6F7FF/004680?text=N/A" class="member-photo" alt="mem3">
+                    <div class="p-4 text-center">
+                        <span class="inline-block bg-gray-100 text-gray-600 text-[10px] px-2 py-1 rounded-full mb-2 font-semibold">Researcher</span>
+                        <h3 class="text-lg font-bold text-natgeo-blue mb-1">N/A</h3>
+                        <p class="text-xs text-gray-500 font-mono">ID: N/A</p>
+                    </div>
+                </div>
+
+                <!-- Member 4: Researcher -->
+                <div class="bg-white rounded-xl shadow-2xl overflow-hidden member-card border-t-8 border-natgeo-blue">
+                    <img src="https://placehold.co/400x400/E6F7FF/004680?text=N/A" class="member-photo" alt="mem4">
+                    <div class="p-4 text-center">
+                        <span class="inline-block bg-gray-100 text-gray-600 text-[10px] px-2 py-1 rounded-full mb-2 font-semibold">Researcher</span>
+                        <h3 class="text-lg font-bold text-natgeo-blue mb-1">N/A</h3>
+                        <p class="text-xs text-gray-500 font-mono">ID: N/A</p>
+                    </div>
+                </div>
+                
+                <!-- Member 5: Researcher -->
+                <div class="bg-white rounded-xl shadow-2xl overflow-hidden member-card border-t-8 border-natgeo-blue">
+                    <img src="https://placehold.co/400x400/E6F7FF/004680?text=N/A" class="member-photo" alt="mem5">
+                    <div class="p-4 text-center">
+                        <span class="inline-block bg-gray-100 text-gray-600 text-[10px] px-2 py-1 rounded-full mb-2 font-semibold">Researcher</span>
+                        <h3 class="text-lg font-bold text-natgeo-blue mb-1">N/A</h3>
+                        <p class="text-xs text-gray-500 font-mono">ID: N/A</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </section>
+
+    <!-- 3. FOOTER (UPDATED DESIGN) -->
+    <footer class="bg-natgeo-blue text-white py-10 mt-auto border-t-8 border-blue-400">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+                
+                <!-- Left Column: Map -->
+                <div class="w-full h-64 md:h-80 rounded-xl overflow-hidden shadow-2xl border-4 border-white/20">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3873.7206201029917!2d100.5840254738333!3d13.855801461230863!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e29d3b2deb49ff%3A0xd2ed4165c39645cc!2z4Lih4Lir4Liy4Lin4Li04LiX4Lii4Liy4Lil4Lix4Lii4Lio4Lij4Li14Lib4LiX4Li44Lih!5e0!3m2!1sth!2sth!4v1763998419672!5m2!1sth!2sth" 
+                        width="100%" 
+                        height="100%" 
+                        style="border:0;" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+
+                <!-- Right Column: Contact Info -->
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="text-3xl font-extrabold text-white mb-1 border-b-2 border-blue-400 inline-block pb-1">ติดต่อสอบถาม</h3>
+                        <h4 class="text-xl font-semibold text-blue-200 mt-2">มหาวิทยาลัยศรีปทุม SPU</h4>
+                    </div>
+                    
+                    <div class="space-y-3 text-base md:text-lg font-light tracking-wide">
+                        <p class="flex items-start">
+                            <span class="font-bold w-20 text-blue-300">โทร :</span> 
+                            02 558 6888
+                        </p>
+                        <p class="flex items-start">
+                            <span class="font-bold w-20 text-blue-300">อีเมล :</span> 
+                            admissions@spu.ac.th
+                        </p>
+                        <p class="flex items-start">
+                            <span class="font-bold w-20 text-blue-300 shrink-0">ที่อยู่ :</span> 
+                            <span>มหาวิทยาลัยศรีปทุม 2410/2 ถ.พหลโยธิน เขตจตุจักร กรุงเทพฯ 10900</span>
+                        </p>
+                    </div>
+
+                    <!-- Social Icons -->
+                    <div class="flex space-x-4 mt-6">
+                        <!-- Line -->
+                        <a href="#" class="bg-white text-natgeo-blue p-2 rounded-full hover:bg-blue-100 transition transform hover:scale-110">
+                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 5.56 2 10.2c0 4.21 3.72 7.71 8.94 8.12.47.04.7.22.81.52l.3 1.07c.13.44.06.9-.36 1.22-.26.19-1.2.7-1.49.85-.46.24-1.44.72 1.26.72 5.51 0 10.54-3.87 10.54-9.5C22 5.56 17.52 2 12 2zm0 14c-4.41 0-8-2.95-8-6.6s3.59-6.6 8-6.6 8 2.95 8 6.6-3.59 6.6-8 6.6z"/></svg>
+                        </a>
+                        <!-- Facebook -->
+                        <a href="#" class="bg-white text-natgeo-blue p-2 rounded-full hover:bg-blue-100 transition transform hover:scale-110">
+                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 5 3.66 9.13 8.44 9.88v-6.99H7.9V12h2.54V9.79c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.23.19 2.23.19v2.47h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.77l-.44 2.89h-2.33v6.99C18.34 21.13 22 17 22 12z"/></svg>
+                        </a>
+                        <!-- Instagram -->
+                        <a href="#" class="bg-white text-natgeo-blue p-2 rounded-full hover:bg-blue-100 transition transform hover:scale-110">
+                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z"/></svg>
+                        </a>
+                        <!-- YouTube -->
+                        <a href="#" class="bg-white text-natgeo-blue p-2 rounded-full hover:bg-blue-100 transition transform hover:scale-110">
+                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M21.58 7.19c-.23-.86-.9-1.54-1.76-1.77C18.26 5 12 5 12 5s-6.26 0-7.82.42c-.86.23-1.54.9-1.77 1.77C2 8.75 2 12 2 12s0 3.25.42 4.81c.23.86.9 1.54 1.76 1.77 1.56.42 7.82.42 7.82.42s6.26 0 7.82-.42c.86-.23 1.54-.9 1.77-1.77C22 15.25 22 12 22 12s0-3.25-.42-4.81zM9.75 15.02V8.98L15.5 12l-5.75 3.02z"/></svg>
+                        </a>
+                        <!-- TikTok -->
+                        <a href="#" class="bg-white text-natgeo-blue p-2 rounded-full hover:bg-blue-100 transition transform hover:scale-110">
+                            <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-12 border-t border-white/20 pt-6 text-center text-sm text-blue-200">
+                &copy; 2025 Antarctica Life Expedition | SPU University. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- =========================================================================
+         4. MODALS (Aggregated from all files)
+    ========================================================================= -->
+    
+    <!-- SEAL MODALS -->
+    <div id="modal-weddell" class="modal fixed inset-0 bg-black bg-opacity-75 hidden z-50 overflow-y-auto" onclick="closeModal(event, 'weddell')">
+        <div class="modal-content bg-white m-4 md:m-20 p-8 rounded-xl shadow-3xl max-w-4xl mx-auto transform translate-y-full" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start border-b-2 border-natgeo-blue pb-4 mb-6">
+                <h3 class="text-4xl font-extrabold text-natgeo-blue">Weddell Seal: ข้อมูลเชิงลึก</h3>
+                <button class="text-gray-500 hover:text-gray-900 text-3xl font-light leading-none" onclick="closeModal(event, 'weddell')">&times;</button>
+            </div>
+            
+            <div class="aspect-w-16 aspect-h-9 mb-6">
+                <div class="video-container">
+                    <iframe class="w-full h-80 rounded-lg shadow-xl" src="https://www.youtube.com/embed/M5E8gulPWh4?autoplay=0&rel=0" title="Weddell Seal Dive" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <h4 class="text-2xl font-bold text-gray-700 mb-2">Weddell Seal Facts:</h4>
+            <p class="text-lg text-gray-600 mb-4">
+                **English:** Weddell Seals possess a modified circulatory system allowing them to stay underwater for over an hour and dive to depths of up to 600 meters. They use their teeth to constantly grind open breathing holes in the ice.
+            </p>
+            <h4 class="text-2xl font-bold text-gray-700 mb-2 mt-4">เกร็ดน่ารู้ (Fun Fact):</h4>
+            <p class="text-lg text-gray-600 mb-4">
+                แมวน้ำเวดเดลล์สามารถดำน้ำได้ลึกถึง 600 เมตร และกลั้นหายใจได้นานถึง 90 นาที ซึ่งถือเป็นสถิติสูงสุดในบรรดาแมวน้ำ
+            </p>
+            <p class="text-lg text-natgeo-blue font-medium border-t pt-4">
+                **Thai (ไทย):** แมวน้ำเวดเดลล์มีระบบไหลเวียนโลหิตที่ปรับเปลี่ยน ทำให้สามารถอยู่ใต้น้ำได้นานกว่าหนึ่งชั่วโมง และดำดิ่งลึกได้ถึง 600 เมตร พวกมันใช้ฟันในการขุดรูหายใจในน้ำแข็ง
+            </p>
+        </div>
+    </div>
+
+    <div id="modal-harp" class="modal fixed inset-0 bg-black bg-opacity-75 hidden z-50 overflow-y-auto" onclick="closeModal(event, 'harp')">
+        <div class="modal-content bg-white m-4 md:m-20 p-8 rounded-xl shadow-3xl max-w-4xl mx-auto transform translate-y-full" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start border-b-2 border-natgeo-blue pb-4 mb-6">
+                <h3 class="text-4xl font-extrabold text-natgeo-blue">Harp Seal: ข้อมูลเชิงลึก</h3>
+                <button class="text-gray-500 hover:text-gray-900 text-3xl font-light leading-none" onclick="closeModal(event, 'harp')">&times;</button>
+            </div>
+            
+            <div class="aspect-w-16 aspect-h-9 mb-6">
+                <div class="video-container">
+                    <iframe class="w-full h-80 rounded-lg shadow-xl" src="https://www.youtube.com/embed/BG_zMQtYB_E?autoplay=0&rel=0" title="Harp Seal Documentary" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <h4 class="text-2xl font-bold text-gray-700 mb-2">Harp Seal Facts:</h4>
+            <p class="text-lg text-gray-600 mb-4">
+                **English:** Harp Seals are highly social and form massive colonies during breeding season on the pack ice. Their white coats help camouflage pups from polar bears and other Arctic predators.
+            </p>
+            <h4 class="text-2xl font-bold text-gray-700 mb-2 mt-4">เกร็ดน่ารู้ (Fun Fact):</h4>
+            <p class="text-lg text-gray-600 mb-4">
+                ลูกแมวน้ำพิณจะผลัดขนสีขาวบริสุทธิ์เมื่ออายุประมาณ 2-3 สัปดาห์ และจะว่ายน้ำได้ตั้งแต่นั้นเป็นต้นมา
+            </p>
+            <p class="text-lg text-natgeo-blue font-medium border-t pt-4">
+                **Thai (ไทย):** แมวน้ำพิณเป็นสัตว์สังคมสูงและรวมตัวกันเป็นอาณานิคมขนาดใหญ่ในช่วงฤดูผสมพันธุ์บนแผ่นน้ำแข็ง เสื้อขนสีขาวของลูกแมวน้ำช่วยในการพรางตัวจากผู้ล่าในอาร์กติก
+            </p>
+        </div>
+    </div>
+
+    <div id="modal-leopard" class="modal fixed inset-0 bg-black bg-opacity-75 hidden z-50 overflow-y-auto" onclick="closeModal(event, 'leopard')">
+        <div class="modal-content bg-white m-4 md:m-20 p-8 rounded-xl shadow-3xl max-w-4xl mx-auto transform translate-y-full" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start border-b-2 border-natgeo-blue pb-4 mb-6">
+                <h3 class="text-4xl font-extrabold text-natgeo-blue">Leopard Seal: ข้อมูลเชิงลึก</h3>
+                <button class="text-gray-500 hover:text-gray-900 text-3xl font-light leading-none" onclick="closeModal(event, 'leopard')">&times;</button>
+            </div>
+            
+            <div class="aspect-w-16 aspect-h-9 mb-6">
+                <div class="video-container">
+                    <iframe class="w-full h-80 rounded-lg shadow-xl" src="https://www.youtube.com/embed/c35dz4DRSeI?autoplay=0&rel=0" title="Leopard Seal Hunting" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <h4 class="text-2xl font-bold text-gray-700 mb-2">Leopard Seal Facts:</h4>
+            <p class="text-lg text-gray-600 mb-4">
+                **English:** Leopard Seals are solitary hunters. They use ambush tactics, often lying in wait near the water's edge to snatch penguins as they enter or exit the water. Their large size and powerful bite make them formidable.
+            </p>
+            <h4 class="text-2xl font-bold text-gray-700 mb-2 mt-4">เกร็ดน่ารู้ (Fun Fact):</h4>
+            <p class="text-lg text-gray-600 mb-4">
+                แมวน้ำเสือดาวมีชื่อเสียงในด้านการล่าเพนกวิน โดยเฉพาะอย่างยิ่งการซุ่มรอที่ขอบน้ำแข็ง
+            </p>
+            <p class="text-lg text-natgeo-blue font-medium border-t pt-4">
+                **Thai (ไทย):** แมวน้ำเสือดาวเป็นนักล่าที่อยู่โดดเดี่ยว พวกมันใช้กลยุทธ์ซุ่มโจมตี โดยจะรออยู่ใกล้ขอบน้ำเพื่อฉกฉวยเพนกวินขณะที่พวกมันเข้าหรือออกจากน้ำ ขนาดที่ใหญ่และการกัดที่ทรงพลังทำให้พวกมันน่าเกรงขาม
+            </p>
+        </div>
+    </div>
+
+    <!-- PENGUIN MODALS -->
+    <div id="modal-emperor" class="modal fixed inset-0 bg-black bg-opacity-75 hidden z-50 overflow-y-auto" onclick="closeModal(event, 'emperor')">
+        <div class="modal-content bg-white m-4 md:m-20 p-8 rounded-xl shadow-3xl max-w-4xl mx-auto transform translate-y-full" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start border-b-2 border-natgeo-blue pb-4 mb-6">
+                <h3 class="text-4xl font-extrabold text-natgeo-blue">Emperor Penguin: วงจรชีวิตในฤดูหนาว</h3>
+                <button class="text-gray-500 hover:text-gray-900 text-3xl font-light leading-none" onclick="closeModal(event, 'emperor')">&times;</button>
+            </div>
+            
+            <div class="aspect-w-16 aspect-h-9 mb-6">
+                <div class="video-container">
+                    <iframe class="w-full h-80 rounded-lg shadow-xl" src="https://www.youtube.com/embed/qWTwan_G6YE?autoplay=0&rel=0" title="Emperor Penguin Life Cycle" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <h4 class="text-2xl font-bold text-gray-700 mb-2">Emperor Penguin Facts:</h4>
+            <p class="text-lg text-gray-600 mb-4">
+                **English:** Emperor Penguins undertake long overland migrations to breeding grounds. Males fast for over two months to incubate the egg, relying on huddles to survive temperatures as low as -60°C.
+            </p>
+            <h4 class="text-2xl font-bold text-gray-700 mb-2 mt-4">เกร็ดน่ารู้ (Fun Fact):</h4>
+            <p class="text-lg text-gray-600 mb-4">
+                พวกมันสามารถดำน้ำได้ลึกกว่า 500 เมตร และกลั้นหายใจได้นานถึง 20 นาที
+            </p>
+            <p class="text-lg text-natgeo-blue font-medium border-t pt-4">
+                **Thai (ไทย):** เพนกวินจักรพรรดิอพยพทางบกเป็นระยะทางไกลไปยังแหล่งผสมพันธุ์ ตัวผู้จะอดอาหารนานกว่าสองเดือนเพื่อกกไข่ อาศัยการรวมกลุ่มกันแน่นเพื่อความอยู่รอดในอุณหภูมิต่ำถึง -60 องศาเซลเซียส
+            </p>
+        </div>
+    </div>
+
+    <div id="modal-adelie" class="modal fixed inset-0 bg-black bg-opacity-75 hidden z-50 overflow-y-auto" onclick="closeModal(event, 'adelie')">
+        <div class="modal-content bg-white m-4 md:m-20 p-8 rounded-xl shadow-3xl max-w-4xl mx-auto transform translate-y-full" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start border-b-2 border-natgeo-blue pb-4 mb-6">
+                <h3 class="text-4xl font-extrabold text-natgeo-blue">Adélie Penguin: การสร้างรังหิน</h3>
+                <button class="text-gray-500 hover:text-gray-900 text-3xl font-light leading-none" onclick="closeModal(event, 'adelie')">&times;</button>
+            </div>
+            
+            <div class="aspect-w-16 aspect-h-9 mb-6">
+                <div class="video-container">
+                    <iframe class="w-full h-80 rounded-lg shadow-xl" src="https://www.youtube.com/embed/A3qfV68q6oY?autoplay=0&rel=0" title="Adelie Penguin Colony Behavior" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <h4 class="text-2xl font-bold text-gray-700 mb-2">Adélie Penguin Facts:</h4>
+            <p class="text-lg text-gray-600 mb-4">
+                **English:** Adélie Penguins build elaborate nests using small stones, which are often stolen from neighboring nests. Their diet consists almost entirely of krill, linking their survival directly to the health of the Southern Ocean ecosystem.
+            </p>
+            <h4 class="text-2xl font-bold text-gray-700 mb-2 mt-4">เกร็ดน่ารู้ (Fun Fact):</h4>
+            <p class="text-lg text-gray-600 mb-4">
+                เพนกวินอดิลีเป็นนักเดินที่ยอดเยี่ยม สามารถเดินได้หลายสิบไมล์เพื่อไปถึงแหล่งหาอาหาร
+            </p>
+            <p class="text-lg text-natgeo-blue font-medium border-t pt-4">
+                **Thai (ไทย):** เพนกวินอดิลีสร้างรังอย่างพิถีพิถันโดยใช้ก้อนหินเล็กๆ ซึ่งมักจะถูกขโมยมาจากรังของเพื่อนบ้าน อาหารหลักของพวกมันคือเคยลช์ ซึ่งเชื่อมโยงการอยู่รอดของพวกมันกับสุขภาพของระบบนิเวศในมหาสมุทรใต้โดยตรง
+            </p>
+        </div>
+    </div>
+
+    <div id="modal-gentoo" class="modal fixed inset-0 bg-black bg-opacity-75 hidden z-50 overflow-y-auto" onclick="closeModal(event, 'gentoo')">
+        <div class="modal-content bg-white m-4 md:m-20 p-8 rounded-xl shadow-3xl max-w-4xl mx-auto transform translate-y-full" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start border-b-2 border-natgeo-blue pb-4 mb-6">
+                <h3 class="text-4xl font-extrabold text-natgeo-blue">Gentoo Penguin: นักว่ายน้ำความเร็วสูง</h3>
+                <button class="text-gray-500 hover:text-gray-900 text-3xl font-light leading-none" onclick="closeModal(event, 'gentoo')">&times;</button>
+            </div>
+            
+            <div class="aspect-w-16 aspect-h-9 mb-6">
+                <div class="video-container">
+                    <iframe class="w-full h-80 rounded-lg shadow-xl" src="https://www.youtube.com/embed/8b5gO3V55oE?autoplay=0&rel=0" title="Gentoo Penguin Swimming" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <h4 class="text-2xl font-bold text-gray-700 mb-2">Gentoo Penguin Facts:</h4>
+            <p class="text-lg text-gray-600 mb-4">
+                **English:** Gentoo Penguins are identifiable by the bright orange-red beak and the prominent white flash over the top of their head. They are incredibly fast underwater, making quick work of catching fish and squid.
+            </p>
+            <h4 class="text-2xl font-bold text-gray-700 mb-2 mt-4">เกร็ดน่ารู้ (Fun Fact):</h4>
+            <p class="text-lg text-gray-600 mb-4">
+                เพนกวินเจนทูเป็นสายพันธุ์ที่สร้างรังที่ใหญ่ที่สุด โดยใช้หินขนาดเล็กและกิ่งไม้
+            </p>
+            <p class="text-lg text-natgeo-blue font-medium border-t pt-4">
+                **Thai (ไทย):** เพนกวินเจนทูสามารถระบุได้จากจงอยปากสีส้มแดงสดใสและแถบสีขาวเด่นบนศีรษะ พวกมันมีความเร็วอย่างไม่น่าเชื่อใต้น้ำ ทำให้สามารถจับปลาและปลาหมึกได้อย่างรวดเร็ว
+            </p>
+        </div>
+    </div>
+
+    <!-- MISC MODALS -->
+    <div id="modal-krill" class="modal fixed inset-0 bg-black bg-opacity-75 hidden z-50 overflow-y-auto" onclick="closeModal(event, 'krill')">
+        <div class="modal-content bg-white m-4 md:m-20 p-8 rounded-xl shadow-3xl max-w-4xl mx-auto transform translate-y-full" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start border-b-2 border-natgeo-blue pb-4 mb-6">
+                <h3 class="text-4xl font-extrabold text-natgeo-blue">Antarctic Krill: รากฐานของระบบนิเวศ</h3>
+                <button class="text-gray-500 hover:text-gray-900 text-3xl font-light leading-none" onclick="closeModal(event, 'krill')">&times;</button>
+            </div>
+            
+            <div class="aspect-w-16 aspect-h-9 mb-6">
+                <div class="video-container">
+                    <iframe class="w-full h-80 rounded-lg shadow-xl" src="https://www.youtube.com/embed/RFqhocQqbgM?autoplay=0&rel=0" title="Krill Swarm Documentary" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <h4 class="text-2xl font-bold text-gray-700 mb-2">Krill Facts:</h4>
+            <p class="text-lg text-gray-600 mb-4">
+                **English:** Krill form massive swarms—so dense they can be seen from space. Their collective biomass is estimated to be one of the largest of any single animal species on Earth. They are responsible for linking phytoplankton energy to higher predators.
+            </p>
+            <h4 class="text-2xl font-bold text-gray-700 mb-2 mt-4">เกร็ดน่ารู้ (Fun Fact):</h4>
+            <p class="text-lg text-gray-600 mb-4">
+                เคยลช์สามารถอยู่ได้โดยไม่ต้องกินอาหารนานถึง 200 วันในฤดูหนาว โดยการลดขนาดตัวลงและใช้พลังงานที่สะสมไว้
+            </p>
+            <p class="text-lg text-natgeo-blue font-medium border-t pt-4">
+                **Thai (ไทย):** เคยลช์รวมตัวกันเป็นฝูงใหญ่จนมองเห็นได้จากอวกาศ มวลรวมของพวกมันคาดว่าเป็นหนึ่งในมวลรวมที่ใหญ่ที่สุดในบรรดาสัตว์ชนิดเดียวบนโลก พวกมันทำหน้าที่เชื่อมโยงพลังงานของแพลงก์ตอนพืชกับสัตว์ผู้ล่าระดับสูง
+            </p>
+        </div>
+    </div>
+
+    <div id="modal-icefish" class="modal fixed inset-0 bg-black bg-opacity-75 hidden z-50 overflow-y-auto" onclick="closeModal(event, 'icefish')">
+        <div class="modal-content bg-white m-4 md:m-20 p-8 rounded-xl shadow-3xl max-w-4xl mx-auto transform translate-y-full" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start border-b-2 border-natgeo-blue pb-4 mb-6">
+                <h3 class="text-4xl font-extrabold text-natgeo-blue">Antarctic Icefish: การปรับตัวสู่ความหนาวจัด</h3>
+                <button class="text-gray-500 hover:text-gray-900 text-3xl font-light leading-none" onclick="closeModal(event, 'icefish')">&times;</button>
+            </div>
+            
+            <div class="aspect-w-16 aspect-h-9 mb-6">
+                <div class="video-container">
+                    <iframe class="w-full h-80 rounded-lg shadow-xl" src="https://www.youtube.com/embed/6dKB40hYlrs?autoplay=0&rel=0" title="Icefish Antifreeze Documentary" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <h4 class="text-2xl font-bold text-gray-700 mb-2">Icefish Facts:</h4>
+            <p class="text-lg text-gray-600 mb-4">
+                **English:** The lack of red blood cells gives the icefish blood a transparent, pale appearance. They survive freezing temperatures by producing unique antifreeze glyco-proteins that prevent ice crystals from forming in their bodies.
+            </p>
+            <h4 class="text-2xl font-bold text-gray-700 mb-2 mt-4">เกร็ดน่ารู้ (Fun Fact):</h4>
+            <p class="text-lg text-gray-600 mb-4">
+                เนื่องจากไม่มีเม็ดเลือดแดง ปลาใต้น้ำแข็งจึงมีเหงือกสีขาวซีดแทนที่จะเป็นสีแดงสด
+            </p>
+            <p class="text-lg text-natgeo-blue font-medium border-t pt-4">
+                **Thai (ไทย):** การขาดเม็ดเลือดแดงทำให้เลือดของปลาใต้น้ำแข็งมีลักษณะโปร่งใสและซีดจาง พวกมันรอดชีวิตจากอุณหภูมิเยือกแข็งได้ด้วยการสร้างไกลโคโปรตีนป้องกันการแข็งตัว (antifreeze) ที่ป้องกันไม่ให้ผลึกน้ำแข็งก่อตัวในร่างกาย
+            </p>
+        </div>
+    </div>
+
+    <div id="modal-squid" class="modal fixed inset-0 bg-black bg-opacity-75 hidden z-50 overflow-y-auto" onclick="closeModal(event, 'squid')">
+        <div class="modal-content bg-white m-4 md:m-20 p-8 rounded-xl shadow-3xl max-w-4xl mx-auto transform translate-y-full" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-start border-b-2 border-natgeo-blue pb-4 mb-6">
+                <h3 class="text-4xl font-extrabold text-natgeo-blue">Colossal Squid: ยักษ์ใหญ่แห่งความลึก</h3>
+                <button class="text-gray-500 hover:text-gray-900 text-3xl font-light leading-none" onclick="closeModal(event, 'squid')">&times;</button>
+            </div>
+            
+            <div class="aspect-w-16 aspect-h-9 mb-6">
+                <div class="video-container">
+                    <iframe class="w-full h-80 rounded-lg shadow-xl" src="https://www.youtube.com/embed/n4f7rC7KkH4?autoplay=0&rel=0" title="Colossal Squid Footage" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            </div>
+
+            <h4 class="text-2xl font-bold text-gray-700 mb-2">Colossal Squid Facts:</h4>
+            <p class="text-lg text-gray-600 mb-4">
+                **English:** The Colossal Squid has the largest eyes of any animal on Earth, measuring up to 30 cm across. Unlike the Giant Squid, its massive tentacles are equipped with sharp swiveling hooks instead of suckers.
+            </p>
+            <h4 class="text-2xl font-bold text-gray-700 mb-2 mt-4">เกร็ดน่ารู้ (Fun Fact):</h4>
+            <p class="text-lg text-gray-600 mb-4">
+                ปลาหมึกยักษ์ใหญ่อาศัยอยู่ในน้ำที่หนาวจัดของมหาสมุทรใต้ ซึ่งทำให้การศึกษาวิจัยพวกมันทำได้ยากมาก
+            </p>
+            <p class="text-lg text-natgeo-blue font-medium border-t pt-4">
+                **Thai (ไทย):** ปลาหมึกยักษ์ใหญ่มีดวงตาที่ใหญ่ที่สุดในบรรดาสัตว์ทั้งหมดบนโลก โดยมีขนาดใหญ่ถึง 30 ซม. แทนที่จะมีแค่หนวดดูดอย่างปลาหมึกยักษ์ทั่วไป หนวดขนาดมหึมาของมันติดตั้งด้วยตะขอหมุนได้ที่แหลมคม
+            </p>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         5. JAVASCRIPT LOGIC (Router & Interactivity)
+    ========================================================================= -->
+    <script>
+        // --- 1. ROUTER FUNCTION ---
+        function navigateTo(pageId, sectionId = null) {
+            // Hide all pages
+            const pages = document.querySelectorAll('.page-section');
+            pages.forEach(page => {
+                page.classList.add('hidden-section');
+                page.classList.remove('active-section');
+            });
+
+            // Show target page
+            const targetPage = document.getElementById('page-' + pageId);
+            if (targetPage) {
+                targetPage.classList.remove('hidden-section');
+                targetPage.classList.add('active-section');
+            }
+
+            // Scroll Logic
+            if (sectionId) {
+                // If a specific section is requested (e.g., #about), scroll to it
+                setTimeout(() => {
+                    const el = document.getElementById(sectionId);
+                    if(el) el.scrollIntoView({ behavior: 'smooth' });
+                }, 50);
+            } else {
+                // Otherwise scroll to top
+                window.scrollTo(0, 0);
+            }
+
+            // Close Mobile Menu if open
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        // --- 2. SMOOTH SCROLL HELPER (For "Explore Wildlife" button) ---
+        function scrollToSection(id) {
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- 3. UI TOGGLES ---
+        // Mobile Menu
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+
+        // Dropdown Logic
+        const dropdownBtn = document.getElementById('wildlife-dropdown-btn');
+        const dropdownMenu = document.getElementById('wildlife-dropdown-menu');
+        const dropdownContainer = document.getElementById('wildlife-dropdown-container');
+        const dropdownArrow = document.getElementById('dropdown-arrow');
+
+        const toggleDropdown = () => {
+            const isVisible = dropdownMenu.classList.toggle('dropdown-hidden');
+            dropdownMenu.classList.toggle('dropdown-visible');
+            dropdownBtn.setAttribute('aria-expanded', !isVisible);
+            if (!isVisible) {
+                dropdownArrow.classList.add('rotate-180');
+            } else {
+                dropdownArrow.classList.remove('rotate-180');
+            }
+        };
+
+        dropdownBtn.addEventListener('click', toggleDropdown);
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (event) => {
+            if (dropdownMenu.classList.contains('dropdown-visible') && !dropdownContainer.contains(event.target)) {
+                toggleDropdown();
+            }
+        });
+
+        // Close dropdown when a link inside is clicked
+        dropdownMenu.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (dropdownMenu.classList.contains('dropdown-visible')) {
+                    toggleDropdown();
+                }
+            });
+        });
+
+        // --- 4. MODAL LOGIC ---
+        // Helper function to stop video playback
+        const stopModalVideo = (modal) => {
+            const iframe = modal.querySelector('iframe');
+            if (iframe) {
+                const iframeSrc = iframe.src;
+                iframe.src = iframeSrc; // Reset src to stop playback
+            }
+        };
+        
+        const openModal = (species) => {
+            const modal = document.getElementById(`modal-${species}`);
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex', 'items-center', 'justify-center');
+                setTimeout(() => {
+                    modal.querySelector('.modal-content').classList.remove('translate-y-full');
+                    modal.style.opacity = 1;
+                }, 10);
+                document.body.style.overflow = 'hidden';
+            }
+        };
+
+        const closeModal = (event, species) => {
+            const modal = document.getElementById(`modal-${species}`);
+            if (modal) {
+                stopModalVideo(modal);
+                modal.querySelector('.modal-content').classList.add('translate-y-full');
+                modal.style.opacity = 0;
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex', 'items-center', 'justify-center');
+                    document.body.style.overflow = '';
+                }, 300);
+            }
+        };
+
+        // Allow closing modal with ESC key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const openModalElement = document.querySelector('.modal:not(.hidden)');
+                if (openModalElement) {
+                    const species = openModalElement.id.replace('modal-', '');
+                    closeModal(e, species);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
